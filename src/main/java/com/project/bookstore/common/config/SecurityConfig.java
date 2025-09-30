@@ -1,34 +1,30 @@
 package com.project.bookstore.common.config;
 
+import com.project.bookstore.service.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+    private final CustomUserDetailService customDetailService;
 
-    @Bean
-    public UserDetailsService userDetailService() {
-        UserDetails user1 = User.withUsername("Alice")
-                .password("{noop}password123") // {noop} = no password encoding
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withUsername("bob")
-                .password("{noop}admin123")
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user1, admin);
+    public SecurityConfig (CustomUserDetailService customDetailService) {
+        this.customDetailService = customDetailService;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers("/public").permitAll()   // open endpoint
                     .anyRequest().authenticated()
@@ -36,7 +32,23 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .defaultSuccessUrl("/", true)
                 )
+                .userDetailsService(customDetailService)
                 .logout(LogoutConfigurer::permitAll);
     return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authManager (HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+
+        builder.userDetailsService(customDetailService)  // tell Spring to use your service
+                .passwordEncoder(passwordEncoder());     // tell Spring how to verify passwords
+
+        return builder.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
