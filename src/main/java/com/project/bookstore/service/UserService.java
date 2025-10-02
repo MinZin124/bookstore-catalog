@@ -11,6 +11,11 @@ import javax.swing.text.Document;
 public class UserService{
 
     @Secured("ROLE_ADMIN")
+    public String testAdmin() {
+        return "Admin dashboard";
+    }
+
+    @Secured("ROLE_ADMIN")
     public String adminSecureOperation() {
         return "Admin Operation via @Secured";
     }
@@ -20,7 +25,7 @@ public class UserService{
         return "Operation via @PreAuthorize";
     }
 
-    @PreAuthorize("ROLE_USER")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public String userRead() {
         return "Public Books for user";
     }

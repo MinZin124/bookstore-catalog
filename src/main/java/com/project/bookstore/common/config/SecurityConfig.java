@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-@EnableMethodSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @Configuration
 public class SecurityConfig {
     private final CustomUserDetailService customDetailService;
@@ -28,10 +28,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                //Disable CSRF
                 .csrf(AbstractHttpConfigurer::disable)
+
+                //Set stateless session management
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
+                //Configure Authorization Rule
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers("/public").permitAll()   // open endpoint
                     .anyRequest().authenticated()
