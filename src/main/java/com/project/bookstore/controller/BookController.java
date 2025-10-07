@@ -23,15 +23,13 @@ public class BookController {
 
     @GetMapping
     public List<BookResponseDto> getAllBooks() {
-        return bookService.getAllBooks().stream()
-                .map(b -> new BookResponseDto(b.getId(), b.getTitle(), b.getIsbn(), b.getPublicationYear(), b.getPrice(), b.getAuthor().getId()))
-                .collect(Collectors.toList());
+        return bookService.getAllBooks();
     }
 
     @GetMapping("/{id}")
     public BookResponseDto getBookById(@PathVariable Long id) {
         Book b = bookService.getBookById(id);
-        return new BookResponseDto(b.getId(), b.getTitle(), b.getIsbn(), b.getPublicationYear(), b.getPrice(), b.getAuthor().getId());
+        return new BookResponseDto(b);
     }
 
     @PostMapping
@@ -43,18 +41,22 @@ public class BookController {
         book.setPrice(dto.getPrice());
         Book saved = bookService.createBook(book, dto.getAuthorId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new BookResponseDto(saved.getId(), saved.getTitle(), saved.getIsbn(), saved.getPublicationYear(), saved.getPrice(), saved.getAuthor().getId()));
+                .body(new BookResponseDto(saved));
     }
 
     @PutMapping("/{id}")
-    public BookResponseDto updateBook(@PathVariable Long id, @RequestBody BookRequestDto dto) {
+    public ResponseEntity<BookResponseDto> updateBook(@PathVariable Long id, @RequestBody BookRequestDto dto) {
         Book updated = new Book();
         updated.setTitle(dto.getTitle());
         updated.setIsbn(dto.getIsbn());
         updated.setPublicationYear(dto.getPublicationYear());
         updated.setPrice(dto.getPrice());
-        Book saved = bookService.updateBook(id, updated, dto.getAuthorId());
-        return new BookResponseDto(saved.getId(), saved.getTitle(), saved.getIsbn(), saved.getPublicationYear(), saved.getPrice(), saved.getAuthor().getId());
+
+        BookResponseDto saved = bookService.updateBook(id, updated, dto.getAuthorId());
+
+        BookResponseDto response = new BookResponseDto(
+                saved);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
@@ -66,7 +68,7 @@ public class BookController {
     @GetMapping("/author/{authorId}")
     public List<BookResponseDto> getBooksByAuthor(@PathVariable Long authorId) {
         return bookService.getBooksByAuthor(authorId).stream()
-                .map(b -> new BookResponseDto(b.getId(), b.getTitle(), b.getIsbn(), b.getPublicationYear(), b.getPrice(), b.getAuthor().getId()))
+                .map(BookResponseDto::new)
                 .collect(Collectors.toList());
     }
 }

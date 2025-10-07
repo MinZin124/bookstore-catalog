@@ -1,5 +1,6 @@
 package com.project.bookstore.data;
 
+import com.project.bookstore.entity.Book;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,12 +16,15 @@ public class BookResponseDto {
     private Double price;
     private Long authorId;
 
-    public BookResponseDto(Long id, String title, String isbn, Integer publicationYear, Double price, Long authorId) {
-        this.id = id;
-        this.title = title;
-        this.isbn = isbn;
-        this.publicationYear = publicationYear;
-        this.price = price;
-        this.authorId = authorId;
+    public BookResponseDto(Book book) {
+        this.id = book.getId();
+        this.title = book.getTitle();
+        this.isbn = book.getIsbn();
+        this.publicationYear = book.getPublicationYear();
+        this.price = book.getPrice();
+        this.authorId = book.getId();
+    }
+
+    public BookResponseDto(BookResponseDto saved) {
     }
 }

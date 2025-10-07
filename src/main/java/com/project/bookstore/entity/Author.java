@@ -1,5 +1,6 @@
 package com.project.bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class Author {
     private String bio;
 
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Book> books;
 
     public Author() {
