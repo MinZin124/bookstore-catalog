@@ -5,6 +5,11 @@ import com.project.bookstore.data.BookRequestDto;
 import com.project.bookstore.data.BookResponseDto;
 import com.project.bookstore.entity.Book;
 import com.project.bookstore.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "Books", description = "Operations related to books")
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
@@ -21,19 +27,28 @@ public class BookController {
         this.bookService = bookService;
     }
 
+    @Operation(summary = "Get all books", description = "Retrieve a list of all books in the store")
     @GetMapping
     public List<BookResponseDto> getAllBooks() {
         return bookService.getAllBooks();
     }
 
+    @Operation(summary = "Get a book by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Book found"),
+            @ApiResponse(responseCode = "404", description = "Book not found")
+    })
     @GetMapping("/{id}")
-    public BookResponseDto getBookById(@PathVariable Long id) {
+    public BookResponseDto getBookById(@Parameter (description = "ID of the book to retrieve") @PathVariable Long id) {
         Book b = bookService.getBookById(id);
         return new BookResponseDto(b);
     }
 
+    @Operation (summary = "Add a new book")
     @PostMapping
-    public ResponseEntity<BookResponseDto> createBook(@RequestBody BookRequestDto dto) {
+    public ResponseEntity<BookResponseDto> createBook(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Book details to add")
+            @RequestBody BookRequestDto dto) {
         Book book = new Book();
         book.setTitle(dto.getTitle());
         book.setIsbn(dto.getIsbn());

@@ -4,6 +4,7 @@ import com.project.bookstore.data.AuthorRequestDto;
 import com.project.bookstore.data.AuthorResponseDto;
 import com.project.bookstore.entity.Author;
 import com.project.bookstore.service.AuthorService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "Authors", description = "Operations related to Authors")
 @RestController
 @RequestMapping("/api/authors")
 public class AuthorController {

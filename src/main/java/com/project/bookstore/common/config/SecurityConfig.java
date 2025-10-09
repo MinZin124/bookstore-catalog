@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 //Disable CSRF
                 .csrf(AbstractHttpConfigurer::disable)
 
@@ -42,8 +42,8 @@ public class SecurityConfig {
                 )
                 .httpBasic(Customizer.withDefaults())
                 .userDetailsService(customDetailService)
-                .logout(LogoutConfigurer::permitAll);
-    return http.build();
+                .logout(LogoutConfigurer::permitAll)
+                .build();
     }
 
     @Bean
